@@ -13,8 +13,13 @@ let camera;
 
 app.listen(3000);
 
+let timer;
 const io = socketio(server);
 server.listen(3090);
+
+io.on('disconnect', () => {
+  clearInterval(timer);
+});
 
 io.on('connection', (socket) => {
   console.log('connection!');
@@ -24,7 +29,7 @@ io.on('connection', (socket) => {
       camera = new cv.VideoCapture(0);
     }
 
-    setInterval(() => {
+    timer = setInterval(() => {
       camera.read((err, im) => {
         if (err) {
           throw err;
