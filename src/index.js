@@ -6,7 +6,10 @@ import socketio from 'socket.io';
 
 const app = new Koa();
 const server = http.createServer(app.callback());
+
 //app.use(serve('/'));
+const COLOR = [0, 255, 0]; // default red
+const thickness = 2; // default 1
 
 app.listen(3000);
 
@@ -26,7 +29,8 @@ io.on('connection', (socket) => {
           throw err;
         }
         if (im.size()[0] > 0 && im.size()[1] > 0) {
-
+          socket.emit('frame', { buffer: im.toBuffer() });
+          /*
           im.detectObject(cv.FACE_CASCADE, {}, (err2, faces) => {
             if (err) {
               throw err;
@@ -38,13 +42,14 @@ io.on('connection', (socket) => {
                let face = faces[i];
                im.rectangle([face.x, face.y], [face.width, face.height], COLOR, 2);
              }
+             // window.show(im);
+             socket.emit('frame', { buffer: im.toBuffer() });
           });
-          // window.show(im);
-          socket.emit('frame', { buffer: im.toBuffer() });
+          */
         }
         // window.blockingWaitKey(0, 50);
       });
-    }, 10);
+    }, 100);
   }
   catch (e) {
     console.log('Couldn\'t start camera:', e);
