@@ -51,8 +51,8 @@ io.on('connection', (socket) => {
             }
             if (out && face) {
               socket.emit('frame', {
-                position: { x: face.x, y: face.y },
-                size: { width: face.width, height: face.height },
+                position: { x: face.x / WIDTH, y: face.y / HEIGHT },
+                size: { width: face.width / WIDTH, height: face.height / HEIGHT },
                 buffer: out.toBuffer()
               });
             }
