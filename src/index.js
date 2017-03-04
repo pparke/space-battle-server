@@ -7,16 +7,7 @@ import socketio from 'socket.io';
 const app = new Koa();
 const server = http.createServer(app.callback());
 
-//app.use(serve('/'));
-const BLUE = [0, 255, 0]; // B, G, R
-const RED = [0, 0, 255]; // B, G, R
-const GREEN = [0, 255, 0]; // B, G, R
-const WHITE = [255, 255, 255]; // B, G, R
-const thickness = 2; // default 1
-const lowThresh = 0;
-const highThresh = 100;
-const nIters = 2;
-const minArea = 2000;
+// app.use(serve('/'));
 
 let camera;
 
@@ -32,7 +23,6 @@ io.on('connection', (socket) => {
     if (!camera) {
       camera = new cv.VideoCapture(0);
     }
-    // const out = new cv.Matrix(HEIGHT, WIDTH);
 
     setInterval(() => {
       camera.read((err, im) => {
@@ -43,47 +33,29 @@ io.on('connection', (socket) => {
         const [WIDTH, HEIGHT] = im.size();
 
         if (WIDTH > 0 && HEIGHT > 0) {
-          const out = im.copy();
-
-          // contour detection
-          const contourIm = im.copy();
-          contourIm.convertGrayscale();
-          contourIm.canny(lowThresh, highThresh);
-          contourIm.dilate(nIters);
-          const contours = contourIm.findContours();
-
-          for (let i = 0; i < contours.size(); i++) {
-            if (contours.area(i) < minArea) {
-              continue;
-            }
-
-            const arcLength = contours.arcLength(i, true);
-            contours.approxPolyDP(i, 0.01 * arcLength, true);
-            switch(contours.cornerCount(i)) {
-              case 3:
-                out.drawContour(contours, i, GREEN);
-                break;
-              case 4:
-                out.drawContour(contours, i, RED);
-                break;
-              default:
-                out.drawContour(contours, i, WHITE);
-            }
-          }
 
           // face detection
           im.detectObject(cv.FACE_CASCADE, {}, (err2, faces) => {
             if (err2) {
               throw err2;
             }
+
+            let out = new cv.Matrix(HEIGHT, WIDTH);
+            let face = { x: 0, y: 0, width: 0, height: 0 };
+
             if (faces.length > 0) {
               for (let i = 0; i < faces.length; i++) {
-                const face = faces[i];
-                out.rectangle([face.x, face.y], [face.width, face.height], BLUE, 2);
+                face = faces[i];
+                out = im.roi(face.x, face.y, face.width, face.height);
               }
             }
-
-             socket.emit('frame', { buffer: out.toBuffer() });
+            if (out && face) {
+              socket.emit('frame', {
+                position: { x: face.x, y: face.y },
+                size: { width: face.width, height: face.height },
+                buffer: out.toBuffer()
+              });
+            }
           });
         }
       });
