@@ -49,10 +49,8 @@ io.on('connection', (socket) => {
             let face = { x: 0, y: 0, width: 0, height: 0 };
 
             if (faces.length > 0) {
-              for (let i = 0; i < faces.length; i++) {
-                face = faces[i];
-                out = im.roi(face.x, face.y, face.width, face.height);
-              }
+              face = faces[0];
+              out = im.roi(face.x, face.y, face.width, face.height);
             }
             if (out && face) {
               socket.emit('frame', {
