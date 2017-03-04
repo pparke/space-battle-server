@@ -1,0 +1,35 @@
+{
+  "name": "opencv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "`npm bin`/babel-node ./src",
+    "build": "babel ./src -d ./dist"
+  },
+  "nyc": {
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "koa": "^2.0.1",
+    "koa-static": "^3.0.0",
+    "opencv": "^6.0.0",
+    "socket.io": "^1.7.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.3.2",
+    "babel-preset-latest": "^6.22.0",
+    "eslint": "^3.16.1",
+    "eslint-plugin-babel": "^4.1.0"
+  }
+}
